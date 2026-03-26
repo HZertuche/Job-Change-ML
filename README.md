@@ -102,7 +102,7 @@ job_change_ml
 - **Pandas / NumPy** – Data manipulation and feature engineering  
 - **Scikit-learn** – Data preprocessing, model evaluation, and metrics  
 - **XGBoost** – Gradient boosting algorithm for classification  
-- **Matplotlib / Seaborn** – Data visualization and exploratory analysis  
+- **Matplotlib / Seaborn** – Exploratory data analysis (EDA) 
 - **Parquet** – Columnar storage format optimized for analytics  
 
 ## Project Architecture
