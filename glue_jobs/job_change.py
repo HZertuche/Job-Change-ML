@@ -3,16 +3,15 @@ def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
     from pyspark.sql.functions import col, when, regexp_replace
     from pyspark.sql.window import Window
     
-    # Obtener DataFrame
+    # Load the input DynamicFrame as a Spark DataFrame
     df = dfc.select(list(dfc.keys())[0]).toDF()
     
-    # Identifying cities
+    # Extract the numeric city identifier from the city column
     df = df.withColumn(
         "city",
         regexp_replace("city","city_","").cast("int")
 )
-    
-    # Limpiar columna gender
+    # Encode gender values as numeric categories
     df = df.withColumn(
         "gender",
         when(col("gender") == "Male", 1)
@@ -20,7 +19,7 @@ def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
         .otherwise(0)
     )
     
-    # Limpiar columna experience
+    # Standardize experience values and convert them to integers
     df = df.withColumn(
         "experience",
         when(col("experience") == ">20", 21)
@@ -28,13 +27,13 @@ def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
         .otherwise(col("experience").cast("int"))
     )
     
-    #Limpiar columna Relevant Experiemce
+    # Encode relevant experience as a binary feature
     df = df.withColumn(
         "relevent_experience",
         when(col("relevent_experience") == "Has relevent experience", 1)
         .otherwise(0)
     )
-    # Limpiar columna Enrolled University
+    # Encode university enrollment status as numeric categories
     df = df.withColumn(
         "enrolled_university",
         when(col("enrolled_university") == "no_enrollment", 0)
@@ -42,7 +41,7 @@ def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
         .when(col("enrolled_university") == "Part time course", 2)
         .otherwise(3)
     )
-    # Limpiar columna Company type
+    # Encode company type as numeric categories
     df = df.withColumn(
         "company_type",
         when(col("company_type") == "Pvt Ltd", 1)
@@ -53,8 +52,7 @@ def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
         .otherwise(0)
     ) 
     
-    
-    # Limpiar last_new_job
+    # Standardize last_new_job values and convert them to integers
     df = df.withColumn(
         "last_new_job",
         when(col("last_new_job") == ">4", 5)
@@ -62,7 +60,7 @@ def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
         .otherwise(col("last_new_job").cast("int"))
     )
     
-    # Convertir company_size a categorías numéricas
+    # Encode company size as ordinal numeric categories
     df = df.withColumn(
         "company_size",
         when(col("company_size") == "<10", 1)
@@ -76,10 +74,10 @@ def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
         .otherwise(0)
     )
     
-    # Si es string como '0.0' o '1.0'
+    # Cast target values from string/float format to integer
     df = df.withColumn("target", col("target").cast("float").cast("int"))
     
-    # Convertir a categorias los niveles de educacion
+    # Encode education level as ordinal numeric categories
     df = df.withColumn(
         "education_level",
         when(col("education_level") == "Primary School", 1)
@@ -90,14 +88,13 @@ def MyTransform (glueContext, dfc) -> DynamicFrameCollection:
         .otherwise(0)
     )
     
-    
-    # Detectar perfil senior
+    # Create a binary flag to identify senior candidates
     df = df.withColumn(
         "senior_candidate",
         when(col("experience") >= 10, 1).otherwise(0)
     )
     
-    # Convertir nuevamente a DynamicFrame
+    # Convert the cleaned DataFrame back to a DynamicFrame
     dynamic_frame = DynamicFrame.fromDF(df, glueContext, "cleaned_data")
     
     return DynamicFrameCollection({"CustomTransform0": dynamic_frame}, glueContext)
