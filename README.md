@@ -209,7 +209,7 @@ scale_pos_weight=scale
 
 | Confusion Matrix | Evaluation Metrics |
 |-------------|-------------|
-| ![](screenshots/confusion_matrix_model1.PNG) | ![](screenshots/classification_report_model2.PNG)  |
+| ![](screenshots/confusion_matrix_model2.PNG) | ![](screenshots/classification_report_model2.PNG)  |
   
 The second model improves recall for the positive class, identifying a higher proportion of candidates likely to change jobs.
 
