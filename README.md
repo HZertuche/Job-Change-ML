@@ -10,14 +10,53 @@ End-to-end machine learning pipeline built on AWS to predict candidate job chang
 ![Scikit-Learn](https://img.shields.io/badge/ML-ScikitLearn-yellow)
 ![Parquet](https://img.shields.io/badge/Data%20Format-Parquet-lightgrey)
 
+## Table of Contents
+- [Project Highlights](#project-highlights)
+- [Project Overview](#project-overview)
+- [Objective](#objective)
+- [Dataset Source](#dataset-source)
+- [Dataset](#dataset)
+- [Project Structure](#project-structure)
+- [Tech Stack](#tech-stack)
+- [Project Architecture](#project-architecture)
+- [Architecture Diagram](#architecture-diagram)
+- [Data Preprocessing](#data-preprocessing)
+- [Data Quality Validation](#data-quality-validation)
+- [How to Run](#how-to-run)
+- [Handling Class Imbalance](#handling-class-imbalance)
+- [Machine Learning Model](#machine-learning-model)
+- [Evaluation Metrics](#evaluation-metrics)
+- [Model Results](#model-results)
+- [Feature Importance](#feature-importance)
+- [Business Impact](#business-impact)
+- [Assumptions and Limitations](#assumptions-and-limitations)
+- [Future Improvements](#future-improvements)
+
+## Project Highlights
+
+- Built an end-to-end ETL pipeline and machine learning model to predict candidate job change behavior.
+- Transformed raw CSV datasets into optimized Parquet files for analytical workloads.
+- Implemented data validation checks to ensure dataset consistency.
+- Performed feature engineering and handled class imbalance to improve model performance.
+- Trained and tuned machine learning models to optimize predictive accuracy.
+- Evaluated model performance and visualized key metrics and feature importance.
+
 ## Project Overview
 
-This project builds a machine learning model to predict if a candidate is likely to change jobs using demographic, educational, and professional features.
+This project develops a machine learning model to predict whether a candidate is likely to change jobs based on demographic, educational, and professional attributes.
 
-The workflow includes data preprocessing, feature engineering, model training, and model evaluation.
+The workflow includes data preprocessing, feature engineering, handling class imbalance, model training, hyperparameter tuning, and performance evaluation to build a reliable predictive model.
 
 ## Objective
 The objective of this project is to predict whether a candidate is likely to change jobs, helping companies optimize training investments and improve workforce planning.
+
+## Dataset Source
+This project uses the **HR Analytics: Job Change of Data Scientists dataset**, a public dataset commonly used for analytics and machine learning projects.
+
+- **Source:** [Kaggle - Job Change of Data Scientists](https://www.kaggle.com/datasets/arashnic/hr-analytics-job-change-of-data-scientists)
+- **Usage:** Educational and portfolio purposes only
+
+> **Note:** This dataset is a sample of historical candidate data and does not represent full production data.
 
 ## Dataset
 The dataset contains information about candidates who signed up for company training programs. 
@@ -51,19 +90,20 @@ job_change_ml
 │ └── cleaned/
 │
 ├── glue_jobs/
-├── notebook/
+├── notebooks/
 └── screenshots/
 ```
 
 ## Tech Stack
-- Python 
-- Pandas / NumPy – Data manipulation  
-- Amazon S3 - Storage 
-- AWS Glue – Data cleaning and preprocessing 
-- AWS SageMaker – Jupyter notebooks and model training  
-- XGBoost – Machine learning algorithm  
-- Scikit-learn – Data splitting and evaluation metrics  
-- Matplotlib / Seaborn – Visualization
+- **Python** – Data processing and machine learning pipeline development  
+- **Amazon S3** – Cloud data storage  
+- **AWS Glue** – Data cleaning and preprocessing  
+- **AWS SageMaker** – Model development and training environment  
+- **Pandas / NumPy** – Data manipulation and feature engineering  
+- **Scikit-learn** – Data preprocessing, model evaluation, and metrics  
+- **XGBoost** – Gradient boosting algorithm for classification  
+- **Matplotlib / Seaborn** – Data visualization and exploratory analysis  
+- **Parquet** – Columnar storage format optimized for analytics  
 
 ## Project Architecture
 
@@ -71,17 +111,17 @@ Raw CSV → S3 → Glue Job → Parquet Storage → SageMaker
 
 ## Architecture Diagram
         
-        Raw Data (CSV)
+        Raw Data (CSV files)
             │
             ▼
         Amazon S3 (Storage)
             │
             ▼
         AWS Glue Jobs
-    Data Cleaning & Feature Engineering
+    (Data Cleaning + Feature Engineering)
             │
             ▼
-        Clean Dataset (Parquet)
+        Amazon S3 (Parquet)
             │
             ▼
         AWS SageMaker
@@ -94,23 +134,40 @@ Raw CSV → S3 → Glue Job → Parquet Storage → SageMaker
 ## Data Preprocessing
 Steps performed in the project:
 
-1. Missing values were imputed (Unknown or numeric replacements).  
-2. Categorical features were converted to numeric using label encoding.  
-3. Columns like *experience* and *last_new_job* were cleaned to handle special values like >20 or never.  
-4. Derived feature *senior_candidate* added (experience ≥10 years).  
-5. Data was saved in clean Parquet format using AWS Glue.
+1. Extracted raw candidate data from CSV files.
+2. Selected analytical features relevant for job change prediction.
+3. Handled missing values using appropriate imputations (categorical and numerical).
+4. Cleaned and standardized columns with special values such as *experience* and *last_new_job*.
+5. Encoded categorical variables using label encoding.
+6. Generated additional features such as *senior_candidate* based on experience levels.
+7. Exported curated outputs in Parquet format using AWS Glue.
+
 
 ## Data Quality Validation
-- Validation of non-null values for critical fields
-- Verification of correct data types
-- Handling of special categorical values (">20", "never")
-- Consistency checks for engineered features
+
+During the transformation stage, several validation checks were applied:
+
+- Ensured that critical fields do not contain null values.
+- Validated data types for selected features.
+- Standardized and handled special categorical values such as ">20" and "never".
+- Verified consistency of engineered features such as *senior_candidate*.
+
+## How to Run
+
+1. Download the Job Change of Data Scientists dataset from Kaggle.
+2. Upload the raw CSV files to the appropriate folders in your Amazon S3 bucket.
+3. Run the AWS Glue jobs to clean and preprocess the datasets.
+4. Store the curated output in Parquet format.
+5. Load the processed dataset into Amazon SageMaker.
+6. Perform feature engineering and handle class imbalance.
+7. Train and evaluate machine learning models.
+8. Generate visualizations to analyze model performance.
 
 ## Handling Class Imbalance
 
-The dataset is imbalanced, with significantly more candidates not looking for job changes.
+The dataset is imbalanced, with a significantly higher number of candidates not looking for job changes.
 
-To address this issue, the parameter **scale_pos_weight** was used in the XGBoost model to balance the positive class during training.
+To address this issue, the **scale_pos_weight** parameter was applied in the XGBoost model to balance the positive class during training and improve recall for minority class predictions.
 
 ## Machine Learning Model
 
@@ -118,19 +175,20 @@ To address this issue, the parameter **scale_pos_weight** was used in the XGBoos
 
 An **XGBoost classifier** was selected due to its strong performance on tabular datasets and ability to handle non-linear relationships between features.
 
-**Hyperparameters:**
+### Hyperparameter Tuning
 
-***First Model***
+Two models were trained to evaluate performance improvements:
+
+
+**Model #1**
 n_estimators=200,
 max_depth=6,
 learning_rate=0.1
 
-***Second Model***
-n_estimators=350,
+**Model #2***
+n_estimators=200,
 max_depth=6,
-learning_rate=0.07,
-subsample=0.9,
-colsample_bytree=0.8,
+learning_rate=0.1,
 scale_pos_weight=scale
 
 ## Evaluation Metrics
@@ -141,45 +199,77 @@ scale_pos_weight=scale
 - F1-score
 
 ## Model Results
-### First Model
-                precision    recall  f1-score   support
+### Model 1
 
-           0       0.85      0.87      0.86      2880
-           1       0.57      0.53      0.55       952
+| Confusion Matrix | Evaluation Metrics |
+|-------------|-------------|
+| ![](screenshots/confusion_matrix_model1.PNG) |  ![](screenshots/classification_report_model1.PNG)  |
 
-    accuracy                           0.78      3832
-   macro avg       0.71      0.70      0.70      3832
-weighted avg       0.78      0.78      0.78      3832
+### Model 2
 
-### Second Model
-                precision    recall  f1-score   support
+| Confusion Matrix | Evaluation Metrics |
+|-------------|-------------|
+| ![](screenshots/confusion_matrix_model1.PNG) | ![](screenshots/classification_report_model2.PNG)  |
+  
+The second model improves recall for the positive class, identifying a higher proportion of candidates likely to change jobs.
 
-           0       0.89      0.80      0.84      2880
-           1       0.54      0.70      0.61       952
+This trade-off slightly reduces precision but results in better detection of high-risk candidates, which is more valuable for business scenarios such as talent retention and recruitment planning.
 
-    accuracy                           0.78      3832
-   macro avg       0.71      0.75      0.73      3832
-weighted avg       0.80      0.78      0.78      3832
+## Feature Importance
 
-The second model improves recall for the positive class, detecting 17% more candidates likely to change jobs.
+Feature importance analysis was performed to identify the most influential variables in predicting whether a candidate is likely to change jobs.
+
+![Feature Importance](screenshots/feature_importance_model1.PNG)
+
+The model is primarily driven by a small number of highly influential features:
+
+- **city_development_index (~24%)** – This remains the most influential variable, suggesting that local economic and development conditions strongly affect job change behavior.
+- **company_type (~21%)** – The type of company continues to play a major role, likely reflecting differences in work environment, benefits, stability, and career opportunities.
+- **senior_candidate (~12%)** – Seniority now appears as one of the strongest predictors, indicating that more experienced candidates may follow different job-change patterns.
+
+Together, these three features account for more than half of the model’s predictive importance.
+
+Other relevant variables include:
+
+- **education_level (~9%)** – Educational background contributes meaningfully to the prediction.
+- **relevent_experience (~8%)** – Previous relevant experience also helps explain job mobility.
+- **company_size (~5%)** – Organizational size has a moderate influence on whether a candidate is likely to switch jobs.
+
+The remaining features, such as **last_new_job**, **experience**, **city**, **training_hours**, **enrolled_university**, and **gender**, have comparatively smaller contributions.
+
+Overall, the results suggest that job change behavior is influenced more by external and professional-context factors—such as city development, company characteristics, and seniority—than by demographic variables alone.
 
 ## Business Impact
 
-Predicting job change probability allows companies to:
+- **Talent retention:** Predicting job change probability helps organizations identify high-risk employees and implement retention strategies before attrition occurs.
 
-- Identify candidates more likely to leave after training.
-- Optimize training investment.
-- Improve candidate targeting for recruitment.
+- **Training optimization:** Companies can prioritize training investments on candidates with lower likelihood of leaving, maximizing return on investment.
 
-## Visualizations
-| Feature Importance |
-|--------------------------------|
-| ![](screenshots/first_model_feature_importance.PNG) |
+- **Recruitment strategy:** Identifying candidates more likely to change jobs enables recruiters to target individuals who are actively open to new opportunities.
 
-| Confusion Matrix (1 Model) | Confusion Matrix (2 Model) |
-|-------------|-------------|
-| ![](screenshots/first_model_confusion_matrix.PNG) | ![](screenshots/second_model_confusion_matrix.PNG) |
+- **Workforce planning:** Insights from job change patterns support better long-term workforce planning and reduce unexpected turnover.
 
-| Accuracy, Precision, Recall and F1-Score (1 Model) | Accuracy, Precision, Recall and F1-Score (2 Model) |
-|--------------|--------------|
-| ![](screenshots/first_model_stats.PNG) | ![](screenshots/second_model_stats.PNG) |
+- **Cost reduction:** Reducing employee churn helps minimize costs associated with hiring, onboarding, and training new employees.
+
+## Key Insights
+- The model shows strong performance in identifying candidates not likely to change jobs, but requires optimization to better detect high-risk candidates.
+
+- Improving recall for the positive class significantly increases the model’s ability to identify candidates likely to change jobs, which is critical for retention strategies.
+
+- Feature importance analysis indicates that **city_development_index** is the strongest predictor, followed by **company_type** and **senior_candidate**. This suggests that external conditions and professional context have a greater influence on job change behavior than personal attributes alone.
+
+- Class imbalance has a significant impact on model performance, requiring techniques such as weighted training to improve minority class detection.
+
+## Assumptions and Limitations
+- This dataset is a public sample and does not represent full production HR data.
+- The analysis is based on historical candidate data and should be interpreted as exploratory.
+- The model assumes that historical patterns are indicative of future job change behavior.
+- Class imbalance may affect model performance, particularly in predicting minority class outcomes.
+- Business insights are inferred from model predictions and feature relationships, not from real organizational data or financial metrics.
+
+## Future Improvements
+- Improve model performance using advanced techniques such as hyperparameter optimization and ensemble methods.
+- Implement additional feature engineering to capture more complex candidate behavior patterns.
+- Apply advanced interpretability techniques such as SHAP values for deeper model insights.
+- Deploy the model as an API for real-time predictions.
+- Integrate the pipeline into a production environment with automated retraining workflows.
