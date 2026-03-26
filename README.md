@@ -209,11 +209,13 @@ scale_pos_weight=scale
 
 | Confusion Matrix | Evaluation Metrics |
 |-------------|-------------|
-| ![](screenshots/confusion_matrix_model1.PNG) | ![](screenshots/classification_report_model2.PNG)  |
+| ![](screenshots/confusion_matrix_model2.PNG) | ![](screenshots/classification_report_model2.PNG)  |
   
-The second model improves recall for the positive class, identifying a higher proportion of candidates likely to change jobs.
+The balanced model improves detection of candidates likely to change jobs by increasing **recall for the Change class from 0.58 to 0.76**. This makes it more effective for identifying high-risk candidates.
 
-This trade-off slightly reduces precision but results in better detection of high-risk candidates, which is more valuable for business scenarios such as talent retention and recruitment planning.
+This improvement comes with a trade-off: **precision for the Change class** decreases slightly from **0.59 to 0.55**, and **overall accuracy** drops marginally from **0.79 to 0.78**. In addition, while **precision for the No Change class** improves from **0.86 to 0.91**, its recall decreases from **0.87 to 0.79**.
+
+Overall, the second model is better aligned with the objective of this analysis: predicting which candidates are likely to change jobs. Although it sacrifices a small amount of precision and overall accuracy, it is more effective at identifying candidates at risk of leaving, which makes it the more suitable model for this use case.
 
 ## Feature Importance
 
